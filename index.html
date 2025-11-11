@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🇩🇪 German Word of the Day 🇩🇪</title>
+  <meta name="description" content="Prepare for your Germany adventure! ✈️" />
+  <style>
+    :root{
+      --bg:#ffffff;
+      --ink:#1a1a1a;
+      --muted:#6b7280;
+      --card:#fafafa;
+      --card2:#ffffff;
+      --accent:#e30613; /* bright red numbers/titles */
+      --shadow:0 12px 30px rgba(0,0,0,.06);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;}
+    .wrap{max-width:980px;margin:0 auto;padding:28px 16px 60px}
+    header{display:flex;align-items:center;gap:12px}
+    .flag{font-size:30px}
+    h1{margin:0;font-size:clamp(26px,5vw,44px);font-weight:900;letter-spacing:.2px}
+    .sub{margin-top:6px;color:var(--muted);font-size:16px}
+
+    /* Countdown card */
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-top:22px}
+    .card h2{margin:0 0 8px;font-size:26px}
+    .date-row{color:var(--muted);font-weight:700;margin-bottom:14px}
+    .count-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .count-box{background:var(--card2);border-radius:18px;padding:20px 10px;text-align:center;box-shadow:var(--shadow)}
+    .count-num{font-size:48px;line-height:1;margin:0 0 6px;color:var(--accent);font-weight:900}
+    .count-label{font-size:14px;color:#374151}
+
+    /* Today card */
+    .today-title{color:#374151;font-size:14px;letter-spacing:.3px;text-transform:uppercase;margin:0 0 12px}
+    .chip{display:inline-flex;align-items:center;background:#fff;border:1px solid #eee;border-radius:999px;padding:6px 12px;font-size:13px;margin-bottom:10px}
+    .word{font-size:clamp(42px,8vw,68px);font-weight:900;margin:6px 0 0}
+    .pron{color:#667085;font-style:italic;margin:8px 0 4px;font-size:20px}
+    .translation{color:var(--accent);font-weight:900;font-size:28px;margin:8px 0 0}
+    .example{margin-top:20px;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:var(--shadow)}
+    .example .lbl{color:#6b7280;text-transform:uppercase;font-size:12px;letter-spacing:.25px;margin-bottom:8px}
+    .example .de{font-weight:800}
+    .example .en{color:#6b7280;margin-top:6px}
+
+    /* Previous words */
+    .prev{margin-top:22px}
+    .empty{display:flex;gap:10px;align-items:center;justify-content:center;color:#6b7280;background:#fff;border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+    .book{font-size:40px}
+
+    footer{margin-top:36px;color:#6b7280;text-align:center}
+    @media (max-width:640px){ .count-grid{grid-template-columns:repeat(2,1fr);} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="flag">🇩🇪</div>
+      <div>
+        <h1>German Word of the Day <span class="flag">🇩🇪</span></h1>
+        <div class="sub">Prepare for your Germany adventure! ✈️</div>
+      </div>
+    </header>
+
+    <!-- Countdown -->
+    <section class="card">
+      <h2>Your adventure begins in…</h2>
+      <div class="date-row">December 17, 2025</div>
+      <div class="count-grid">
+        <div class="count-box">
+          <div id="d" class="count-num">–</div>
+          <div class="count-label">Days</div>
+        </div>
+        <div class="count-box">
+          <div id="h" class="count-num">–</div>
+          <div class="count-label">Hours</div>
+        </div>
+        <div class="count-box">
+          <div id="m" class="count-num">–</div>
+          <div class="count-label">Minutes</div>
+        </div>
+        <div class="count-box">
+          <div id="s" class="count-num">–</div>
+          <div class="count-label">Seconds</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Today's Word -->
+    <section class="card">
+      <div class="today-title">Today’s Word</div>
+      <div class="chip">👋 Greetings</div>
+      <div id="word" class="word">Guten Tag</div>
+      <div id="pron" class="pron">GOO-ten TAHK</div>
+      <div id="trans" class="translation">Good day / Hello</div>
+
+      <div class="example">
+        <div class="lbl">Example sentence</div>
+        <div id="ex-de" class="de">Guten Tag! Wie geht es Ihnen?</div>
+        <div id="ex-en" class="en">Good day! How are you?</div>
+      </div>
+    </section>
+
+    <!-- Previous Words -->
+    <section class="card prev">
+      <h3 style="margin:0 0 12px;font-size:26px">Previous Words</h3>
+      <div class="empty"><span class="book">📖</span> No previous words yet. Keep learning!</div>
+    </section>
+
+    <footer>Learning German together, one word at a time 📚</footer>
+  </div>
+
+  <script>
+    // Countdown to Dec 17, 2025 at 2:05 PM Central Time (CST = UTC-6)
+    // 2:05 PM CT => 20:05 UTC
+    const DEPARTURE_UTC = new Date('2025-12-17T20:05:00Z').getTime();
+    const elD = document.getElementById('d');
+    const elH = document.getElementById('h');
+    const elM = document.getElementById('m');
+    const elS = document.getElementById('s');
+
+    function tick(){
+      const now = Date.now();
+      let diff = Math.max(0, DEPARTURE_UTC - now);
+      const s = Math.floor(diff/1000) % 60;
+      const m = Math.floor(diff/1000/60) % 60;
+      const h = Math.floor(diff/1000/60/60) % 24;
+      const d = Math.floor(diff/1000/60/60/24);
+      elD.textContent = d;
+      elH.textContent = h;
+      elM.textContent = m;
+      elS.textContent = s;
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    // Static “Guten Tag” content to mirror the screenshot
+    // (If you want daily rotation later, we can add that.)
+    const WORD = {
+      w: 'Guten Tag',
+      p: 'GOO-ten TAHK',
+      en: 'Good day / Hello',
+      de: 'Guten Tag! Wie geht es Ihnen?',
+      enEx: 'Good day! How are you?'
+    };
+    document.getElementById('word').textContent = WORD.w;
+    document.getElementById('pron').textContent = WORD.p;
+    document.getElementById('trans').textContent = WORD.en;
+    document.getElementById('ex-de').textContent = WORD.de;
+    document.getElementById('ex-en').textContent = WORD.enEx;
+  </script>
+</body>
+</html>
