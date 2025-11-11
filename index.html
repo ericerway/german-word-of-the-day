@@ -45,7 +45,7 @@
     .example .de{font-weight:800}
     .example .en{color:#6b7280;margin-top:6px}
 
-    /* Previous words */
+    /* Previous words placeholder (optional to show later) */
     .prev{margin-top:22px}
     .empty{display:flex;gap:10px;align-items:center;justify-content:center;color:#6b7280;background:#fff;border-radius:16px;padding:22px;box-shadow:var(--shadow)}
     .book{font-size:40px}
@@ -91,20 +91,20 @@
     <!-- Today's Word -->
     <section class="card">
       <div class="today-title">Today’s Word</div>
-      <div class="chip">👋 Greetings</div>
-      <div id="word" class="word">Guten Tag</div>
-      <div id="pron" class="pron">GOO-ten TAHK</div>
-      <div id="trans" class="translation">Good day / Hello</div>
+      <div id="chip" class="chip">• Category</div>
+      <div id="word" class="word">—</div>
+      <div id="pron" class="pron">—</div>
+      <div id="trans" class="translation">—</div>
 
       <div class="example">
         <div class="lbl">Example sentence</div>
-        <div id="ex-de" class="de">Guten Tag! Wie geht es Ihnen?</div>
-        <div id="ex-en" class="en">Good day! How are you?</div>
+        <div id="ex-de" class="de"></div>
+        <div id="ex-en" class="en"></div>
       </div>
     </section>
 
-    <!-- Previous Words -->
-    <section class="card prev">
+    <!-- Previous Words (optional to display later) -->
+    <section class="card prev" style="display:none">
       <h3 style="margin:0 0 12px;font-size:26px">Previous Words</h3>
       <div class="empty"><span class="book">📖</span> No previous words yet. Keep learning!</div>
     </section>
@@ -113,14 +113,15 @@
   </div>
 
   <script>
-    // Countdown to Dec 17, 2025 at 2:05 PM Central Time (CST = UTC-6)
-    // 2:05 PM CT => 20:05 UTC
+    /*************
+     * COUNTDOWN *
+     *************/
+    // Dec 17, 2025 2:05 PM Central (CST = UTC-6) => 20:05 UTC
     const DEPARTURE_UTC = new Date('2025-12-17T20:05:00Z').getTime();
-    const elD = document.getElementById('d');
-    const elH = document.getElementById('h');
-    const elM = document.getElementById('m');
-    const elS = document.getElementById('s');
-
+    const elD = document.getElementById('d'),
+          elH = document.getElementById('h'),
+          elM = document.getElementById('m'),
+          elS = document.getElementById('s');
     function tick(){
       const now = Date.now();
       let diff = Math.max(0, DEPARTURE_UTC - now);
@@ -128,28 +129,182 @@
       const m = Math.floor(diff/1000/60) % 60;
       const h = Math.floor(diff/1000/60/60) % 24;
       const d = Math.floor(diff/1000/60/60/24);
-      elD.textContent = d;
-      elH.textContent = h;
-      elM.textContent = m;
-      elS.textContent = s;
+      elD.textContent = d; elH.textContent = h; elM.textContent = m; elS.textContent = s;
     }
-    tick();
-    setInterval(tick, 1000);
+    tick(); setInterval(tick, 1000);
 
-    // Static “Guten Tag” content to mirror the screenshot
-    // (If you want daily rotation later, we can add that.)
-    const WORD = {
-      w: 'Guten Tag',
-      p: 'GOO-ten TAHK',
-      en: 'Good day / Hello',
-      de: 'Guten Tag! Wie geht es Ihnen?',
-      enEx: 'Good day! How are you?'
+    /***********************
+     * WORDS (60+ entries) *
+     ***********************/
+    // Fields: cat=category, w=word, p=pronunciation, en=translation, de=DE example, enEx=EN example
+    const WORDS = [
+      // Greetings / Polite
+      {cat:'Greetings', w:'Guten Tag', p:'GOO-ten TAHK', en:'Good day / Hello', de:'Guten Tag! Wie geht es Ihnen?', enEx:'Good day! How are you?'},
+      {cat:'Greetings', w:'Hallo', p:'HAH-loh', en:'Hi / Hello', de:'Hallo! Schön, dich zu sehen!', enEx:'Hi! Great to see you!'},
+      {cat:'Greetings', w:'Guten Morgen', p:'GOO-ten MOR-gen', en:'Good morning', de:'Guten Morgen! Hast du gut geschlafen?', enEx:'Good morning! Did you sleep well?'},
+      {cat:'Greetings', w:'Guten Abend', p:'GOO-ten AH-bent', en:'Good evening', de:'Guten Abend und herzlich willkommen!', enEx:'Good evening and welcome!'},
+      {cat:'Greetings', w:'Tschüss', p:'TCHOOSS', en:'Bye', de:'Tschüss! Bis später!', enEx:'Bye! See you later!'},
+      {cat:'Polite', w:'Bitte', p:'BIT-teh', en:'Please / You’re welcome', de:'Ein Wasser, bitte.', enEx:'A water, please.'},
+      {cat:'Polite', w:'Danke', p:'DAHN-keh', en:'Thank you', de:'Danke für Ihre Hilfe!', enEx:'Thank you for your help!'},
+      {cat:'Polite', w:'Danke schön', p:'DAHN-keh shern', en:'Thank you very much', de:'Danke schön, das ist sehr nett.', enEx:'Thank you very much, that’s very nice.'},
+      {cat:'Polite', w:'Entschuldigung', p:'ent-SHUL-dee-goong', en:'Excuse me / Sorry', de:'Entschuldigung, sprechen Sie Englisch?', enEx:'Excuse me, do you speak English?'},
+      {cat:'Polite', w:'Gern geschehen', p:'GAIRN ge-SHAY-en', en:'My pleasure', de:'Gern geschehen! Immer wieder.', enEx:'My pleasure! Anytime.'},
+
+      // Travel / Transport
+      {cat:'Travel', w:'Bahnhof', p:'BAHN-hohf', en:'Train station', de:'Der Bahnhof ist in der Nähe.', enEx:'The train station is nearby.'},
+      {cat:'Travel', w:'Flughafen', p:'FLOOG-hah-fen', en:'Airport', de:'Wie komme ich zum Flughafen?', enEx:'How do I get to the airport?'},
+      {cat:'Travel', w:'Gleis', p:'glyce', en:'Platform (train)', de:'Der Zug fährt von Gleis 7.', enEx:'The train departs from platform 7.'},
+      {cat:'Travel', w:'Abfahrt', p:'AHP-fahrt', en:'Departure', de:'Die Abfahrt ist um 14 Uhr.', enEx:'Departure is at 2 p.m.'},
+      {cat:'Travel', w:'Ankunft', p:'AHN-kunft', en:'Arrival', de:'Die Ankunft ist pünktlich.', enEx:'The arrival is on time.'},
+      {cat:'Travel', w:'Fahrkarte', p:'FAR-kar-teh', en:'Ticket (transport)', de:'Eine Fahrkarte nach Salzburg, bitte.', enEx:'A ticket to Salzburg, please.'},
+      {cat:'Travel', w:'Hin und zurück', p:'hin oont tse-RUECK', en:'Round trip', de:'Zwei Fahrkarten hin und zurück.', enEx:'Two round-trip tickets.'},
+      {cat:'Travel', w:'Verspätung', p:'fer-SHPAY-toong', en:'Delay', de:'Der Zug hat zehn Minuten Verspätung.', enEx:'The train is delayed by ten minutes.'},
+      {cat:'Travel', w:'Umsteigen', p:'OOM-shty-gen', en:'To change (trains)', de:'Sie müssen in München umsteigen.', enEx:'You have to change in Munich.'},
+      {cat:'Travel', w:'Ausgang', p:'OWS-gahng', en:'Exit', de:'Der Ausgang ist dort links.', enEx:'The exit is over there on the left.'},
+
+      // Directions
+      {cat:'Directions', w:'Wo ist …?', p:'voh ist', en:'Where is …?', de:'Wo ist die Toilette?', enEx:'Where is the restroom?'},
+      {cat:'Directions', w:'nach', p:'nahkh', en:'to / toward', de:'Die S-Bahn fährt nach Marienplatz.', enEx:'The S-Bahn goes to Marienplatz.'},
+      {cat:'Directions', w:'links', p:'links', en:'left', de:'Bitte links abbiegen.', enEx:'Please turn left.'},
+      {cat:'Directions', w:'rechts', p:'rekhts', en:'right', de:'Die Apotheke ist rechts.', enEx:'The pharmacy is on the right.'},
+      {cat:'Directions', w:'geradeaus', p:'ge-RAH-deh-owss', en:'straight ahead', de:'Gehen Sie geradeaus und dann rechts.', enEx:'Go straight ahead and then right.'},
+
+      // Dining
+      {cat:'Dining', w:'Speisekarte', p:'SHPIE-ze-kar-teh', en:'Menu', de:'Können wir die Speisekarte sehen?', enEx:'Can we see the menu?'},
+      {cat:'Dining', w:'Tisch', p:'tish', en:'Table', de:'Haben Sie einen Tisch für vier?', enEx:'Do you have a table for four?'},
+      {cat:'Dining', w:'Reservierung', p:'reh-zer-VEE-roong', en:'Reservation', de:'Ich habe eine Reservierung auf Müller.', enEx:'I have a reservation under Müller.'},
+      {cat:'Dining', w:'Vorspeise', p:'FOR-shpy-zeh', en:'Starter', de:'Welche Vorspeise empfehlen Sie?', enEx:'Which starter do you recommend?'},
+      {cat:'Dining', w:'Hauptgericht', p:'HOWPT-ge-rikht', en:'Main course', de:'Das Hauptgericht klingt lecker.', enEx:'The main course sounds tasty.'},
+      {cat:'Dining', w:'Nachspeise', p:'NAHKH-shpy-zeh', en:'Dessert', de:'Gibt es eine Nachspeise?', enEx:'Is there a dessert?'},
+      {cat:'Dining', w:'Rechnung', p:'REKH-noong', en:'Bill / Check', de:'Die Rechnung, bitte.', enEx:'The check, please.'},
+      {cat:'Dining', w:'Trinkgeld', p:'TRINK-gelt', en:'Tip', de:'Ist Trinkgeld inbegriffen?', enEx:'Is the tip included?'},
+      {cat:'Dining', w:'Leitungswasser', p:'LIE-toongs-vah-ser', en:'Tap water', de:'Ist Leitungswasser in Ordnung?', enEx:'Is tap water okay?'},
+      {cat:'Dining', w:'Ohne', p:'OH-neh', en:'without', de:'Ohne Zwiebeln, bitte.', enEx:'Without onions, please.'},
+
+      // Shopping / Money
+      {cat:'Shopping', w:'Wie viel kostet das?', p:'vee feel KOSS-tet dass', en:'How much is that?', de:'Wie viel kostet das Andenken?', enEx:'How much is that souvenir?'},
+      {cat:'Shopping', w:'Kartenzahlung', p:'KAR-ten-tsahl-oong', en:'Card payment', de:'Ist Kartenzahlung möglich?', enEx:'Is card payment possible?'},
+      {cat:'Shopping', w:'Bar', p:'bar', en:'Cash', de:'Kann ich bar bezahlen?', enEx:'Can I pay in cash?'},
+      {cat:'Shopping', w:'Quittung', p:'KVIT-oong', en:'Receipt', de:'Bekomme ich eine Quittung?', enEx:'May I have a receipt?'},
+      {cat:'Shopping', w:'Rabatt', p:'rah-BAHT', en:'Discount', de:'Gibt es einen Rabatt?', enEx:'Is there a discount?'},
+
+      // Lodging
+      {cat:'Lodging', w:'Hotel', p:'hoh-TELL', en:'Hotel', de:'Unser Hotel ist am Viktualienmarkt.', enEx:'Our hotel is at Viktualienmarkt.'},
+      {cat:'Lodging', w:'Zimmer', p:'TSIM-mer', en:'Room', de:'Unser Zimmer ist im dritten Stock.', enEx:'Our room is on the third floor.'},
+      {cat:'Lodging', w:'Schlüssel', p:'SHLOO-sel', en:'Key', de:'Wo bekomme ich den Schlüssel?', enEx:'Where do I get the key?'},
+      {cat:'Lodging', w:'Frühstück', p:'FROOSH-tuek', en:'Breakfast', de:'Ist Frühstück inklusive?', enEx:'Is breakfast included?'},
+      {cat:'Lodging', w:'WLAN', p:'VAY-lahn', en:'Wi-Fi', de:'Wie ist das WLAN-Passwort?', enEx:'What is the Wi-Fi password?'},
+
+      // Health / Emergency
+      {cat:'Health', w:'Apotheke', p:'ah-po-TEH-keh', en:'Pharmacy', de:'Wo ist die nächste Apotheke?', enEx:'Where is the nearest pharmacy?'},
+      {cat:'Health', w:'Arzt', p:'ahrtst', en:'Doctor', de:'Ich brauche einen Arzt.', enEx:'I need a doctor.'},
+      {cat:'Health', w:'Krankenhaus', p:'KRANK-en-house', en:'Hospital', de:'Er ist im Krankenhaus.', enEx:'He is in the hospital.'},
+      {cat:'Health', w:'Allergie', p:'al-er-GEE', en:'Allergy', de:'Ich habe eine Nussallergie.', enEx:'I have a nut allergy.'},
+      {cat:'Emergency', w:'Hilfe!', p:'HIL-feh', en:'Help!', de:'Hilfe! Ich habe mich verlaufen.', enEx:'Help! I got lost.'},
+
+      // Weather / Small talk
+      {cat:'Small talk', w:'Wetter', p:'VEH-ter', en:'Weather', de:'Wie ist das Wetter heute?', enEx:'How is the weather today?'},
+      {cat:'Small talk', w:'schön', p:'shern', en:'beautiful / nice', de:'Heute ist es schön warm.', enEx:'Today it’s nicely warm.'},
+      {cat:'Small talk', w:'kalt', p:'kahlt', en:'cold', de:'Im Winter ist es kalt.', enEx:'It is cold in winter.'},
+      {cat:'Small talk', w:'Regen', p:'RAY-gen', en:'rain', de:'Morgen kommt Regen.', enEx:'Rain is coming tomorrow.'},
+      {cat:'Small talk', w:'Sonne', p:'ZON-neh', en:'sun', de:'Die Sonne scheint.', enEx:'The sun is shining.'},
+
+      // Numbers & Time
+      {cat:'Numbers', w:'eins', p:'ines', en:'one', de:'Ein Ticket, bitte.', enEx:'One ticket, please.'},
+      {cat:'Numbers', w:'zwei', p:'tsvye', en:'two', de:'Zwei Fahrkarten nach Zürich.', enEx:'Two tickets to Zurich.'},
+      {cat:'Numbers', w:'drei', p:'dry', en:'three', de:'Drei Erwachsene, ein Kind.', enEx:'Three adults, one child.'},
+      {cat:'Numbers', w:'zehn', p:'tsayn', en:'ten', de:'Zehn Minuten zu Fuß.', enEx:'Ten minutes on foot.'},
+      {cat:'Time', w:'heute', p:'HOY-teh', en:'today', de:'Heute besuchen wir Schloss Nymphenburg.', enEx:'Today we’re visiting Nymphenburg Palace.'},
+      {cat:'Time', w:'morgen', p:'MOR-gen', en:'tomorrow', de:'Morgen fahren wir nach Salzburg.', enEx:'Tomorrow we’re going to Salzburg.'},
+      {cat:'Time', w:'gestern', p:'GES-tern', en:'yesterday', de:'Gestern waren wir in der Altstadt.', enEx:'Yesterday we were in the old town.'},
+
+      // Culture / Places
+      {cat:'Places', w:'Altstadt', p:'ALT-shtaht', en:'old town', de:'Die Altstadt ist sehr schön.', enEx:'The old town is very beautiful.'},
+      {cat:'Places', w:'Schloss', p:'shloss', en:'castle / palace', de:'Das Schloss ist berühmt.', enEx:'The palace is famous.'},
+      {cat:'Places', w:'Berg', p:'bairg', en:'mountain', de:'Der Bergblick ist fantastisch.', enEx:'The mountain view is fantastic.'},
+      {cat:'Places', w:'See', p:'zay', en:'lake', de:'Der See ist kristallklar.', enEx:'The lake is crystal clear.'},
+      {cat:'Culture', w:'Prost!', p:'prohst', en:'Cheers!', de:'Prost! Auf die Reise!', enEx:'Cheers! To the trip!'},
+
+      // Practical
+      {cat:'Practical', w:'Toilette', p:'toy-LET-teh', en:'restroom', de:'Wo ist die Toilette?', enEx:'Where is the restroom?'},
+      {cat:'Practical', w:'Wasser', p:'VAH-ser', en:'water', de:'Kann ich etwas Wasser bekommen?', enEx:'Can I get some water?'},
+      {cat:'Practical', w:'Öffnungszeiten', p:'URF-noongz-tsy-ten', en:'opening hours', de:'Wie sind die Öffnungszeiten?', enEx:'What are the opening hours?'},
+      {cat:'Practical', w:'Eintritt', p:'INE-tritt', en:'admission', de:'Wie hoch ist der Eintritt?', enEx:'How much is the admission?'},
+      {cat:'Practical', w:'Reserviert', p:'reh-zer-VEERT', en:'reserved', de:'Dieser Tisch ist reserviert.', enEx:'This table is reserved.'},
+
+      // Bonus regional
+      {cat:'Bavaria/Austria', w:'Servus', p:'SEHR-voos', en:'Hi/Bye (Bavaria/Austria)', de:'Servus! Wie läuft’s?', enEx:'Hey! How’s it going?'},
+      {cat:'Switzerland', w:'Grüezi', p:'GRUET-see', en:'Hello (Swiss)', de:'Grüezi! Wie gahts?', enEx:'Hello! How are you? (Swiss)'},
+      {cat:'Switzerland', w:'Merci vielmal', p:'MER-see feel-mahl', en:'Thanks a lot (Swiss)', de:'Merci vielmal für d’Hilfe!', enEx:'Thanks a lot for the help!'},
+    ];
+
+    /*************************
+     * DAILY WORD SELECTION  *
+     *************************/
+    // We pick a deterministic “random” word for the local calendar day,
+    // so it changes at midnight for your family’s location.
+    function todayKey(){
+      const now = new Date();
+      return `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+    }
+    function hash(str){
+      // tiny FNV-1a for deterministic index
+      let h = 2166136261 >>> 0;
+      for (let i=0;i<str.length;i++){
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+    function pickTodayWord(){
+      const key = todayKey();
+      const idx = hash(key) % WORDS.length;
+      return {key, word: WORDS[idx]};
+    }
+
+    /**************
+     * RENDERING  *
+     **************/
+    const els = {
+      chip: document.getElementById('chip'),
+      word: document.getElementById('word'),
+      pron: document.getElementById('pron'),
+      trans: document.getElementById('trans'),
+      exDe: document.getElementById('ex-de'),
+      exEn: document.getElementById('ex-en'),
     };
-    document.getElementById('word').textContent = WORD.w;
-    document.getElementById('pron').textContent = WORD.p;
-    document.getElementById('trans').textContent = WORD.en;
-    document.getElementById('ex-de').textContent = WORD.de;
-    document.getElementById('ex-en').textContent = WORD.enEx;
+
+    function render(entry){
+      els.chip.textContent = `• ${entry.cat}`;
+      els.word.textContent = entry.w;
+      els.pron.textContent = entry.p;
+      els.trans.textContent = entry.en;
+      els.exDe.textContent = entry.de;
+      els.exEn.textContent = entry.enEx;
+    }
+
+    /****************
+     * HISTORY (opt) *
+     ****************/
+    const STORAGE_KEY = 'gwotd-history-v1';
+    function loadHistory(){
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }
+      catch(e){ return []; }
+    }
+    function saveHistory(list){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list.slice(0,60)));
+    }
+
+    (function init(){
+      const {key, word} = pickTodayWord();
+      // Store (date, word) once per day
+      const hist = loadHistory();
+      if (!hist.find(h => h.date === key)){
+        hist.unshift({date:key, w:word.w});
+        saveHistory(hist);
+      }
+      render(word);
+    })();
   </script>
 </body>
 </html>
