@@ -68,7 +68,7 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="flag">🇩🇪</div>
+      
       <div>
         <h1> Word of the Day <span class="flag">🇩🇪</span></h1>
         <div class="sub">Prepare for your European trip! ✈️</div>
@@ -99,11 +99,13 @@
       <div class="controls">
         <button id="speak" class="btn">🔊 Listen</button>
         <button id="speak-slow" class="btn secondary">🐢 Slow</button>
+      </div><br>
+       <div class="cities">
         <span class="small" style="margin-left:8px">City:</span>
-        <button class="pill" data-city="munich" aria-pressed="true">Munich</button>
-        <button class="pill" data-city="salzburg" aria-pressed="false">Salzburg</button>
-        <button class="pill" data-city="swiss" aria-pressed="false">Zurich</button>
-      </div>
+        <button class="pill" data-city="munich" aria-pressed="true">🇩🇪 Munich</button>
+        <button class="pill" data-city="salzburg" aria-pressed="false">🇦🇹 Salzburg</button>
+        <button class="pill" data-city="swiss" aria-pressed="false">🇨🇭 Zurich</button>
+      </div>        
 
       <div class="example">
         <div class="lbl">Example sentence</div>
@@ -118,8 +120,6 @@
       <div id="prev-empty" class="empty"><span class="book">📖</span> No previous words yet. Keep learning!</div>
       <div id="prev" class="prev-grid"></div>
     </section>
-
-    <footer>Learning German together, one word at a time 📚</footer>
   </div>
 
   <script>
