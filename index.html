@@ -12,7 +12,7 @@
       --muted:#6b7280;
       --card:#fafafa;
       --card2:#ffffff;
-      --accent:#e30613; /* bright red numbers/titles */
+      --accent:#e30613;
       --shadow:0 12px 30px rgba(0,0,0,.06);
       --radius:22px;
     }
@@ -25,7 +25,7 @@
     h1{margin:0;font-size:clamp(26px,5vw,44px);font-weight:900;letter-spacing:.2px}
     .sub{margin-top:6px;color:var(--muted);font-size:16px}
 
-    /* Countdown card */
+    /* Card / countdown */
     .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-top:22px}
     .card h2{margin:0 0 8px;font-size:26px}
     .date-row{color:var(--muted);font-weight:700;margin-bottom:14px}
@@ -39,14 +39,25 @@
     .chip{display:inline-flex;align-items:center;background:#fff;border:1px solid #eee;border-radius:999px;padding:6px 12px;font-size:13px;margin-bottom:10px}
     .word{font-size:clamp(42px,8vw,68px);font-weight:900;margin:6px 0 0}
     .pron{color:#667085;font-style:italic;margin:8px 0 4px;font-size:20px}
-    .translation{color:var(--accent);font-weight:900;font-size:28px;margin:8px 0 0}
-    .example{margin-top:20px;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:var(--shadow)}
+    .translation{color:var(--accent);font-weight:900;font-size:28px;margin:8px 0 10px}
+
+    .controls{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin:8px 0 2px}
+    .btn{background:#111;color:#fff;border:none;border-radius:12px;padding:9px 13px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+    .btn.secondary{background:#fff;color:#111;border:1px solid #eee}
+    .pill{background:#fff;border:1px solid #eee;border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer;box-shadow:var(--shadow)}
+    .pill[aria-pressed="true"]{border-color:var(--accent)}
+
+    .example{margin-top:16px;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:var(--shadow)}
     .example .lbl{color:#6b7280;text-transform:uppercase;font-size:12px;letter-spacing:.25px;margin-bottom:8px}
     .example .de{font-weight:800}
     .example .en{color:#6b7280;margin-top:6px}
 
-    /* Previous words placeholder (optional to show later) */
+    /* Previous words */
     .prev{margin-top:22px}
+    .prev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .prev-card{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:var(--shadow)}
+    .prev-title{font-weight:800}
+    .small{font-size:12px;color:#6b7280}
     .empty{display:flex;gap:10px;align-items:center;justify-content:center;color:#6b7280;background:#fff;border-radius:16px;padding:22px;box-shadow:var(--shadow)}
     .book{font-size:40px}
 
@@ -69,22 +80,10 @@
       <h2>Your adventure begins in…</h2>
       <div class="date-row">December 17, 2025</div>
       <div class="count-grid">
-        <div class="count-box">
-          <div id="d" class="count-num">–</div>
-          <div class="count-label">Days</div>
-        </div>
-        <div class="count-box">
-          <div id="h" class="count-num">–</div>
-          <div class="count-label">Hours</div>
-        </div>
-        <div class="count-box">
-          <div id="m" class="count-num">–</div>
-          <div class="count-label">Minutes</div>
-        </div>
-        <div class="count-box">
-          <div id="s" class="count-num">–</div>
-          <div class="count-label">Seconds</div>
-        </div>
+        <div class="count-box"><div id="d" class="count-num">–</div><div class="count-label">Days</div></div>
+        <div class="count-box"><div id="h" class="count-num">–</div><div class="count-label">Hours</div></div>
+        <div class="count-box"><div id="m" class="count-num">–</div><div class="count-label">Minutes</div></div>
+        <div class="count-box"><div id="s" class="count-num">–</div><div class="count-label">Seconds</div></div>
       </div>
     </section>
 
@@ -96,6 +95,16 @@
       <div id="pron" class="pron">—</div>
       <div id="trans" class="translation">—</div>
 
+      <!-- controls: TTS + region -->
+      <div class="controls">
+        <button id="speak" class="btn">🔊 Listen</button>
+        <button id="speak-slow" class="btn secondary">🐢 Slow</button>
+        <span class="small" style="margin-left:8px">City:</span>
+        <button class="pill" data-city="munich" aria-pressed="true">Munich</button>
+        <button class="pill" data-city="salzburg" aria-pressed="false">Salzburg</button>
+        <button class="pill" data-city="swiss" aria-pressed="false">Switzerland</button>
+      </div>
+
       <div class="example">
         <div class="lbl">Example sentence</div>
         <div id="ex-de" class="de"></div>
@@ -103,10 +112,11 @@
       </div>
     </section>
 
-    <!-- Previous Words (optional to display later) -->
-    <section class="card prev" style="display:none">
+    <!-- Previous Words -->
+    <section class="card prev">
       <h3 style="margin:0 0 12px;font-size:26px">Previous Words</h3>
-      <div class="empty"><span class="book">📖</span> No previous words yet. Keep learning!</div>
+      <div id="prev-empty" class="empty"><span class="book">📖</span> No previous words yet. Keep learning!</div>
+      <div id="prev" class="prev-grid"></div>
     </section>
 
     <footer>Learning German together, one word at a time 📚</footer>
@@ -116,7 +126,7 @@
     /*************
      * COUNTDOWN *
      *************/
-    // Dec 17, 2025 2:05 PM Central (CST = UTC-6) => 20:05 UTC
+    // Dec 17, 2025 2:05 PM CT (UTC-6) → 20:05 UTC
     const DEPARTURE_UTC = new Date('2025-12-17T20:05:00Z').getTime();
     const elD = document.getElementById('d'),
           elH = document.getElementById('h'),
@@ -134,137 +144,116 @@
     tick(); setInterval(tick, 1000);
 
     /***********************
-     * WORDS (60+ entries) *
+     * WORDS (with regions)*
      ***********************/
-    // Fields: cat=category, w=word, p=pronunciation, en=translation, de=DE example, enEx=EN example
+    // r: allowed regions -> 'general' (all), 'bavaria', 'austria', 'swiss'
     const WORDS = [
       // Greetings / Polite
-      {cat:'Greetings', w:'Guten Tag', p:'GOO-ten TAHK', en:'Good day / Hello', de:'Guten Tag! Wie geht es Ihnen?', enEx:'Good day! How are you?'},
-      {cat:'Greetings', w:'Hallo', p:'HAH-loh', en:'Hi / Hello', de:'Hallo! Schön, dich zu sehen!', enEx:'Hi! Great to see you!'},
-      {cat:'Greetings', w:'Guten Morgen', p:'GOO-ten MOR-gen', en:'Good morning', de:'Guten Morgen! Hast du gut geschlafen?', enEx:'Good morning! Did you sleep well?'},
-      {cat:'Greetings', w:'Guten Abend', p:'GOO-ten AH-bent', en:'Good evening', de:'Guten Abend und herzlich willkommen!', enEx:'Good evening and welcome!'},
-      {cat:'Greetings', w:'Tschüss', p:'TCHOOSS', en:'Bye', de:'Tschüss! Bis später!', enEx:'Bye! See you later!'},
-      {cat:'Polite', w:'Bitte', p:'BIT-teh', en:'Please / You’re welcome', de:'Ein Wasser, bitte.', enEx:'A water, please.'},
-      {cat:'Polite', w:'Danke', p:'DAHN-keh', en:'Thank you', de:'Danke für Ihre Hilfe!', enEx:'Thank you for your help!'},
-      {cat:'Polite', w:'Danke schön', p:'DAHN-keh shern', en:'Thank you very much', de:'Danke schön, das ist sehr nett.', enEx:'Thank you very much, that’s very nice.'},
-      {cat:'Polite', w:'Entschuldigung', p:'ent-SHUL-dee-goong', en:'Excuse me / Sorry', de:'Entschuldigung, sprechen Sie Englisch?', enEx:'Excuse me, do you speak English?'},
-      {cat:'Polite', w:'Gern geschehen', p:'GAIRN ge-SHAY-en', en:'My pleasure', de:'Gern geschehen! Immer wieder.', enEx:'My pleasure! Anytime.'},
+      {cat:'Greetings', w:'Guten Tag', p:'GOO-ten TAHK', en:'Good day / Hello', de:'Guten Tag! Wie geht es Ihnen?', enEx:'Good day! How are you?', r:['general']},
+      {cat:'Greetings', w:'Hallo', p:'HAH-loh', en:'Hi / Hello', de:'Hallo! Schön, dich zu sehen!', enEx:'Hi! Great to see you!', r:['general']},
+      {cat:'Greetings', w:'Guten Morgen', p:'GOO-ten MOR-gen', en:'Good morning', de:'Guten Morgen! Hast du gut geschlafen?', enEx:'Good morning! Did you sleep well?', r:['general']},
+      {cat:'Greetings', w:'Guten Abend', p:'GOO-ten AH-bent', en:'Good evening', de:'Guten Abend und herzlich willkommen!', enEx:'Good evening and welcome!', r:['general']},
+      {cat:'Greetings', w:'Tschüss', p:'TCHOOSS', en:'Bye', de:'Tschüss! Bis später!', enEx:'Bye! See you later!', r:['general']},
+      {cat:'Polite', w:'Bitte', p:'BIT-teh', en:'Please / You’re welcome', de:'Ein Wasser, bitte.', enEx:'A water, please.', r:['general']},
+      {cat:'Polite', w:'Danke', p:'DAHN-keh', en:'Thank you', de:'Danke für Ihre Hilfe!', enEx:'Thank you for your help!', r:['general']},
+      {cat:'Polite', w:'Danke schön', p:'DAHN-keh shern', en:'Thank you very much', de:'Danke schön, das ist sehr nett.', enEx:'Thank you very much, that’s very nice.', r:['general']},
+      {cat:'Polite', w:'Entschuldigung', p:'ent-SHUL-dee-goong', en:'Excuse me / Sorry', de:'Entschuldigung, sprechen Sie Englisch?', enEx:'Excuse me, do you speak English?', r:['general']},
+      {cat:'Polite', w:'Gern geschehen', p:'GAIRN ge-SHAY-en', en:'My pleasure', de:'Gern geschehen! Immer wieder.', enEx:'My pleasure! Anytime.', r:['general']},
 
       // Travel / Transport
-      {cat:'Travel', w:'Bahnhof', p:'BAHN-hohf', en:'Train station', de:'Der Bahnhof ist in der Nähe.', enEx:'The train station is nearby.'},
-      {cat:'Travel', w:'Flughafen', p:'FLOOG-hah-fen', en:'Airport', de:'Wie komme ich zum Flughafen?', enEx:'How do I get to the airport?'},
-      {cat:'Travel', w:'Gleis', p:'glyce', en:'Platform (train)', de:'Der Zug fährt von Gleis 7.', enEx:'The train departs from platform 7.'},
-      {cat:'Travel', w:'Abfahrt', p:'AHP-fahrt', en:'Departure', de:'Die Abfahrt ist um 14 Uhr.', enEx:'Departure is at 2 p.m.'},
-      {cat:'Travel', w:'Ankunft', p:'AHN-kunft', en:'Arrival', de:'Die Ankunft ist pünktlich.', enEx:'The arrival is on time.'},
-      {cat:'Travel', w:'Fahrkarte', p:'FAR-kar-teh', en:'Ticket (transport)', de:'Eine Fahrkarte nach Salzburg, bitte.', enEx:'A ticket to Salzburg, please.'},
-      {cat:'Travel', w:'Hin und zurück', p:'hin oont tse-RUECK', en:'Round trip', de:'Zwei Fahrkarten hin und zurück.', enEx:'Two round-trip tickets.'},
-      {cat:'Travel', w:'Verspätung', p:'fer-SHPAY-toong', en:'Delay', de:'Der Zug hat zehn Minuten Verspätung.', enEx:'The train is delayed by ten minutes.'},
-      {cat:'Travel', w:'Umsteigen', p:'OOM-shty-gen', en:'To change (trains)', de:'Sie müssen in München umsteigen.', enEx:'You have to change in Munich.'},
-      {cat:'Travel', w:'Ausgang', p:'OWS-gahng', en:'Exit', de:'Der Ausgang ist dort links.', enEx:'The exit is over there on the left.'},
+      {cat:'Travel', w:'Bahnhof', p:'BAHN-hohf', en:'Train station', de:'Der Bahnhof ist in der Nähe.', enEx:'The train station is nearby.', r:['general']},
+      {cat:'Travel', w:'Flughafen', p:'FLOOG-hah-fen', en:'Airport', de:'Wie komme ich zum Flughafen?', enEx:'How do I get to the airport?', r:['general']},
+      {cat:'Travel', w:'Gleis', p:'glyce', en:'Platform (train)', de:'Der Zug fährt von Gleis 7.', enEx:'The train departs from platform 7.', r:['general']},
+      {cat:'Travel', w:'Abfahrt', p:'AHP-fahrt', en:'Departure', de:'Die Abfahrt ist um 14 Uhr.', enEx:'Departure is at 2 p.m.', r:['general']},
+      {cat:'Travel', w:'Ankunft', p:'AHN-kunft', en:'Arrival', de:'Die Ankunft ist pünktlich.', enEx:'The arrival is on time.', r:['general']},
+      {cat:'Travel', w:'Fahrkarte', p:'FAR-kar-teh', en:'Ticket (transport)', de:'Eine Fahrkarte nach Salzburg, bitte.', enEx:'A ticket to Salzburg, please.', r:['general','austria','bavaria']},
+      {cat:'Travel', w:'Hin und zurück', p:'hin oont tse-RUECK', en:'Round trip', de:'Zwei Fahrkarten hin und zurück.', enEx:'Two round-trip tickets.', r:['general']},
+      {cat:'Travel', w:'Verspätung', p:'fer-SHPAY-toong', en:'Delay', de:'Der Zug hat zehn Minuten Verspätung.', enEx:'The train is delayed by ten minutes.', r:['general']},
+      {cat:'Travel', w:'Umsteigen', p:'OOM-shty-gen', en:'To change (trains)', de:'Sie müssen in München umsteigen.', enEx:'You have to change in Munich.', r:['general','bavaria']},
+      {cat:'Travel', w:'Ausgang', p:'OWS-gahng', en:'Exit', de:'Der Ausgang ist dort links.', enEx:'The exit is over there on the left.', r:['general']},
 
       // Directions
-      {cat:'Directions', w:'Wo ist …?', p:'voh ist', en:'Where is …?', de:'Wo ist die Toilette?', enEx:'Where is the restroom?'},
-      {cat:'Directions', w:'nach', p:'nahkh', en:'to / toward', de:'Die S-Bahn fährt nach Marienplatz.', enEx:'The S-Bahn goes to Marienplatz.'},
-      {cat:'Directions', w:'links', p:'links', en:'left', de:'Bitte links abbiegen.', enEx:'Please turn left.'},
-      {cat:'Directions', w:'rechts', p:'rekhts', en:'right', de:'Die Apotheke ist rechts.', enEx:'The pharmacy is on the right.'},
-      {cat:'Directions', w:'geradeaus', p:'ge-RAH-deh-owss', en:'straight ahead', de:'Gehen Sie geradeaus und dann rechts.', enEx:'Go straight ahead and then right.'},
+      {cat:'Directions', w:'Wo ist …?', p:'voh ist', en:'Where is …?', de:'Wo ist die Toilette?', enEx:'Where is the restroom?', r:['general']},
+      {cat:'Directions', w:'nach', p:'nahkh', en:'to / toward', de:'Die S-Bahn fährt nach Marienplatz.', enEx:'The S-Bahn goes to Marienplatz.', r:['general']},
+      {cat:'Directions', w:'links', p:'links', en:'left', de:'Bitte links abbiegen.', enEx:'Please turn left.', r:['general']},
+      {cat:'Directions', w:'rechts', p:'rekhts', en:'right', de:'Die Apotheke ist rechts.', enEx:'The pharmacy is on the right.', r:['general']},
+      {cat:'Directions', w:'geradeaus', p:'ge-RAH-deh-owss', en:'straight ahead', de:'Gehen Sie geradeaus und dann rechts.', enEx:'Go straight ahead and then right.', r:['general']},
 
       // Dining
-      {cat:'Dining', w:'Speisekarte', p:'SHPIE-ze-kar-teh', en:'Menu', de:'Können wir die Speisekarte sehen?', enEx:'Can we see the menu?'},
-      {cat:'Dining', w:'Tisch', p:'tish', en:'Table', de:'Haben Sie einen Tisch für vier?', enEx:'Do you have a table for four?'},
-      {cat:'Dining', w:'Reservierung', p:'reh-zer-VEE-roong', en:'Reservation', de:'Ich habe eine Reservierung auf Müller.', enEx:'I have a reservation under Müller.'},
-      {cat:'Dining', w:'Vorspeise', p:'FOR-shpy-zeh', en:'Starter', de:'Welche Vorspeise empfehlen Sie?', enEx:'Which starter do you recommend?'},
-      {cat:'Dining', w:'Hauptgericht', p:'HOWPT-ge-rikht', en:'Main course', de:'Das Hauptgericht klingt lecker.', enEx:'The main course sounds tasty.'},
-      {cat:'Dining', w:'Nachspeise', p:'NAHKH-shpy-zeh', en:'Dessert', de:'Gibt es eine Nachspeise?', enEx:'Is there a dessert?'},
-      {cat:'Dining', w:'Rechnung', p:'REKH-noong', en:'Bill / Check', de:'Die Rechnung, bitte.', enEx:'The check, please.'},
-      {cat:'Dining', w:'Trinkgeld', p:'TRINK-gelt', en:'Tip', de:'Ist Trinkgeld inbegriffen?', enEx:'Is the tip included?'},
-      {cat:'Dining', w:'Leitungswasser', p:'LIE-toongs-vah-ser', en:'Tap water', de:'Ist Leitungswasser in Ordnung?', enEx:'Is tap water okay?'},
-      {cat:'Dining', w:'Ohne', p:'OH-neh', en:'without', de:'Ohne Zwiebeln, bitte.', enEx:'Without onions, please.'},
+      {cat:'Dining', w:'Speisekarte', p:'SHPIE-ze-kar-teh', en:'Menu', de:'Können wir die Speisekarte sehen?', enEx:'Can we see the menu?', r:['general']},
+      {cat:'Dining', w:'Tisch', p:'tish', en:'Table', de:'Haben Sie einen Tisch für vier?', enEx:'Do you have a table for four?', r:['general']},
+      {cat:'Dining', w:'Reservierung', p:'reh-zer-VEE-roong', en:'Reservation', de:'Ich habe eine Reservierung auf Müller.', enEx:'I have a reservation under Müller.', r:['general']},
+      {cat:'Dining', w:'Vorspeise', p:'FOR-shpy-zeh', en:'Starter', de:'Welche Vorspeise empfehlen Sie?', enEx:'Which starter do you recommend?', r:['general']},
+      {cat:'Dining', w:'Hauptgericht', p:'HOWPT-ge-rikht', en:'Main course', de:'Das Hauptgericht klingt lecker.', enEx:'The main course sounds tasty.', r:['general']},
+      {cat:'Dining', w:'Nachspeise', p:'NAHKH-shpy-zeh', en:'Dessert', de:'Gibt es eine Nachspeise?', enEx:'Is there a dessert?', r:['general']},
+      {cat:'Dining', w:'Rechnung', p:'REKH-noong', en:'Bill / Check', de:'Die Rechnung, bitte.', enEx:'The check, please.', r:['general']},
+      {cat:'Dining', w:'Trinkgeld', p:'TRINK-gelt', en:'Tip', de:'Ist Trinkgeld inbegriffen?', enEx:'Is the tip included?', r:['general']},
+      {cat:'Dining', w:'Leitungswasser', p:'LIE-toongs-vah-ser', en:'Tap water', de:'Ist Leitungswasser in Ordnung?', enEx:'Is tap water okay?', r:['general','austria','swiss','bavaria']},
+      {cat:'Dining', w:'Ohne', p:'OH-neh', en:'without', de:'Ohne Zwiebeln, bitte.', enEx:'Without onions, please.', r:['general']},
 
       // Shopping / Money
-      {cat:'Shopping', w:'Wie viel kostet das?', p:'vee feel KOSS-tet dass', en:'How much is that?', de:'Wie viel kostet das Andenken?', enEx:'How much is that souvenir?'},
-      {cat:'Shopping', w:'Kartenzahlung', p:'KAR-ten-tsahl-oong', en:'Card payment', de:'Ist Kartenzahlung möglich?', enEx:'Is card payment possible?'},
-      {cat:'Shopping', w:'Bar', p:'bar', en:'Cash', de:'Kann ich bar bezahlen?', enEx:'Can I pay in cash?'},
-      {cat:'Shopping', w:'Quittung', p:'KVIT-oong', en:'Receipt', de:'Bekomme ich eine Quittung?', enEx:'May I have a receipt?'},
-      {cat:'Shopping', w:'Rabatt', p:'rah-BAHT', en:'Discount', de:'Gibt es einen Rabatt?', enEx:'Is there a discount?'},
+      {cat:'Shopping', w:'Wie viel kostet das?', p:'vee feel KOSS-tet dass', en:'How much is that?', de:'Wie viel kostet das Andenken?', enEx:'How much is that souvenir?', r:['general']},
+      {cat:'Shopping', w:'Kartenzahlung', p:'KAR-ten-tsahl-oong', en:'Card payment', de:'Ist Kartenzahlung möglich?', enEx:'Is card payment possible?', r:['general','swiss','austria','bavaria']},
+      {cat:'Shopping', w:'Bar', p:'bar', en:'Cash', de:'Kann ich bar bezahlen?', enEx:'Can I pay in cash?', r:['general']},
+      {cat:'Shopping', w:'Quittung', p:'KVIT-oong', en:'Receipt', de:'Bekomme ich eine Quittung?', enEx:'May I have a receipt?', r:['general']},
+      {cat:'Shopping', w:'Rabatt', p:'rah-BAHT', en:'Discount', de:'Gibt es einen Rabatt?', enEx:'Is there a discount?', r:['general']},
 
       // Lodging
-      {cat:'Lodging', w:'Hotel', p:'hoh-TELL', en:'Hotel', de:'Unser Hotel ist am Viktualienmarkt.', enEx:'Our hotel is at Viktualienmarkt.'},
-      {cat:'Lodging', w:'Zimmer', p:'TSIM-mer', en:'Room', de:'Unser Zimmer ist im dritten Stock.', enEx:'Our room is on the third floor.'},
-      {cat:'Lodging', w:'Schlüssel', p:'SHLOO-sel', en:'Key', de:'Wo bekomme ich den Schlüssel?', enEx:'Where do I get the key?'},
-      {cat:'Lodging', w:'Frühstück', p:'FROOSH-tuek', en:'Breakfast', de:'Ist Frühstück inklusive?', enEx:'Is breakfast included?'},
-      {cat:'Lodging', w:'WLAN', p:'VAY-lahn', en:'Wi-Fi', de:'Wie ist das WLAN-Passwort?', enEx:'What is the Wi-Fi password?'},
+      {cat:'Lodging', w:'Hotel', p:'hoh-TELL', en:'Hotel', de:'Unser Hotel ist am Viktualienmarkt.', enEx:'Our hotel is at Viktualienmarkt.', r:['general']},
+      {cat:'Lodging', w:'Zimmer', p:'TSIM-mer', en:'Room', de:'Unser Zimmer ist im dritten Stock.', enEx:'Our room is on the third floor.', r:['general']},
+      {cat:'Lodging', w:'Schlüssel', p:'SHLOO-sel', en:'Key', de:'Wo bekomme ich den Schlüssel?', enEx:'Where do I get the key?', r:['general']},
+      {cat:'Lodging', w:'Frühstück', p:'FROOSH-tuek', en:'Breakfast', de:'Ist Frühstück inklusive?', enEx:'Is breakfast included?', r:['general']},
+      {cat:'Lodging', w:'WLAN', p:'VAY-lahn', en:'Wi-Fi', de:'Wie ist das WLAN-Passwort?', enEx:'What is the Wi-Fi password?', r:['general']},
 
       // Health / Emergency
-      {cat:'Health', w:'Apotheke', p:'ah-po-TEH-keh', en:'Pharmacy', de:'Wo ist die nächste Apotheke?', enEx:'Where is the nearest pharmacy?'},
-      {cat:'Health', w:'Arzt', p:'ahrtst', en:'Doctor', de:'Ich brauche einen Arzt.', enEx:'I need a doctor.'},
-      {cat:'Health', w:'Krankenhaus', p:'KRANK-en-house', en:'Hospital', de:'Er ist im Krankenhaus.', enEx:'He is in the hospital.'},
-      {cat:'Health', w:'Allergie', p:'al-er-GEE', en:'Allergy', de:'Ich habe eine Nussallergie.', enEx:'I have a nut allergy.'},
-      {cat:'Emergency', w:'Hilfe!', p:'HIL-feh', en:'Help!', de:'Hilfe! Ich habe mich verlaufen.', enEx:'Help! I got lost.'},
+      {cat:'Health', w:'Apotheke', p:'ah-po-TEH-keh', en:'Pharmacy', de:'Wo ist die nächste Apotheke?', enEx:'Where is the nearest pharmacy?', r:['general','austria','swiss','bavaria']},
+      {cat:'Health', w:'Arzt', p:'ahrtst', en:'Doctor', de:'Ich brauche einen Arzt.', enEx:'I need a doctor.', r:['general']},
+      {cat:'Health', w:'Krankenhaus', p:'KRANK-en-house', en:'Hospital', de:'Er ist im Krankenhaus.', enEx:'He is in the hospital.', r:['general']},
+      {cat:'Health', w:'Allergie', p:'al-er-GEE', en:'Allergy', de:'Ich habe eine Nussallergie.', enEx:'I have a nut allergy.', r:['general']},
+      {cat:'Emergency', w:'Hilfe!', p:'HIL-feh', en:'Help!', de:'Hilfe! Ich habe mich verlaufen.', enEx:'Help! I got lost.', r:['general']},
 
       // Weather / Small talk
-      {cat:'Small talk', w:'Wetter', p:'VEH-ter', en:'Weather', de:'Wie ist das Wetter heute?', enEx:'How is the weather today?'},
-      {cat:'Small talk', w:'schön', p:'shern', en:'beautiful / nice', de:'Heute ist es schön warm.', enEx:'Today it’s nicely warm.'},
-      {cat:'Small talk', w:'kalt', p:'kahlt', en:'cold', de:'Im Winter ist es kalt.', enEx:'It is cold in winter.'},
-      {cat:'Small talk', w:'Regen', p:'RAY-gen', en:'rain', de:'Morgen kommt Regen.', enEx:'Rain is coming tomorrow.'},
-      {cat:'Small talk', w:'Sonne', p:'ZON-neh', en:'sun', de:'Die Sonne scheint.', enEx:'The sun is shining.'},
+      {cat:'Small talk', w:'Wetter', p:'VEH-ter', en:'Weather', de:'Wie ist das Wetter heute?', enEx:'How is the weather today?', r:['general']},
+      {cat:'Small talk', w:'schön', p:'shern', en:'beautiful / nice', de:'Heute ist es schön warm.', enEx:'Today it’s nicely warm.', r:['general']},
+      {cat:'Small talk', w:'kalt', p:'kahlt', en:'cold', de:'Im Winter ist es kalt.', enEx:'It is cold in winter.', r:['general']},
+      {cat:'Small talk', w:'Regen', p:'RAY-gen', en:'rain', de:'Morgen kommt Regen.', enEx:'Rain is coming tomorrow.', r:['general']},
+      {cat:'Small talk', w:'Sonne', p:'ZON-neh', en:'sun', de:'Die Sonne scheint.', enEx:'The sun is shining.', r:['general']},
 
       // Numbers & Time
-      {cat:'Numbers', w:'eins', p:'ines', en:'one', de:'Ein Ticket, bitte.', enEx:'One ticket, please.'},
-      {cat:'Numbers', w:'zwei', p:'tsvye', en:'two', de:'Zwei Fahrkarten nach Zürich.', enEx:'Two tickets to Zurich.'},
-      {cat:'Numbers', w:'drei', p:'dry', en:'three', de:'Drei Erwachsene, ein Kind.', enEx:'Three adults, one child.'},
-      {cat:'Numbers', w:'zehn', p:'tsayn', en:'ten', de:'Zehn Minuten zu Fuß.', enEx:'Ten minutes on foot.'},
-      {cat:'Time', w:'heute', p:'HOY-teh', en:'today', de:'Heute besuchen wir Schloss Nymphenburg.', enEx:'Today we’re visiting Nymphenburg Palace.'},
-      {cat:'Time', w:'morgen', p:'MOR-gen', en:'tomorrow', de:'Morgen fahren wir nach Salzburg.', enEx:'Tomorrow we’re going to Salzburg.'},
-      {cat:'Time', w:'gestern', p:'GES-tern', en:'yesterday', de:'Gestern waren wir in der Altstadt.', enEx:'Yesterday we were in the old town.'},
+      {cat:'Numbers', w:'eins', p:'ines', en:'one', de:'Ein Ticket, bitte.', enEx:'One ticket, please.', r:['general']},
+      {cat:'Numbers', w:'zwei', p:'tsvye', en:'two', de:'Zwei Fahrkarten nach Zürich.', enEx:'Two tickets to Zurich.', r:['general']},
+      {cat:'Numbers', w:'drei', p:'dry', en:'three', de:'Drei Erwachsene, ein Kind.', enEx:'Three adults, one child.', r:['general']},
+      {cat:'Numbers', w:'zehn', p:'tsayn', en:'ten', de:'Zehn Minuten zu Fuß.', enEx:'Ten minutes on foot.', r:['general']},
+      {cat:'Time', w:'heute', p:'HOY-teh', en:'today', de:'Heute besuchen wir Schloss Nymphenburg.', enEx:'Today we’re visiting Nymphenburg Palace.', r:['general']},
+      {cat:'Time', w:'morgen', p:'MOR-gen', en:'tomorrow', de:'Morgen fahren wir nach Salzburg.', enEx:'Tomorrow we’re going to Salzburg.', r:['general']},
+      {cat:'Time', w:'gestern', p:'GES-tern', en:'yesterday', de:'Gestern waren wir in der Altstadt.', enEx:'Yesterday we were in the old town.', r:['general']},
 
       // Culture / Places
-      {cat:'Places', w:'Altstadt', p:'ALT-shtaht', en:'old town', de:'Die Altstadt ist sehr schön.', enEx:'The old town is very beautiful.'},
-      {cat:'Places', w:'Schloss', p:'shloss', en:'castle / palace', de:'Das Schloss ist berühmt.', enEx:'The palace is famous.'},
-      {cat:'Places', w:'Berg', p:'bairg', en:'mountain', de:'Der Bergblick ist fantastisch.', enEx:'The mountain view is fantastic.'},
-      {cat:'Places', w:'See', p:'zay', en:'lake', de:'Der See ist kristallklar.', enEx:'The lake is crystal clear.'},
-      {cat:'Culture', w:'Prost!', p:'prohst', en:'Cheers!', de:'Prost! Auf die Reise!', enEx:'Cheers! To the trip!'},
+      {cat:'Places', w:'Altstadt', p:'ALT-shtaht', en:'old town', de:'Die Altstadt ist sehr schön.', enEx:'The old town is very beautiful.', r:['general']},
+      {cat:'Places', w:'Schloss', p:'shloss', en:'castle / palace', de:'Das Schloss ist berühmt.', enEx:'The palace is famous.', r:['general']},
+      {cat:'Places', w:'Berg', p:'bairg', en:'mountain', de:'Der Bergblick ist fantastisch.', enEx:'The mountain view is fantastic.', r:['general']},
+      {cat:'Places', w:'See', p:'zay', en:'lake', de:'Der See ist kristallklar.', enEx:'The lake is crystal clear.', r:['general']},
+      {cat:'Culture', w:'Prost!', p:'prohst', en:'Cheers!', de:'Prost! Auf die Reise!', enEx:'Cheers! To the trip!', r:['general']},
 
       // Practical
-      {cat:'Practical', w:'Toilette', p:'toy-LET-teh', en:'restroom', de:'Wo ist die Toilette?', enEx:'Where is the restroom?'},
-      {cat:'Practical', w:'Wasser', p:'VAH-ser', en:'water', de:'Kann ich etwas Wasser bekommen?', enEx:'Can I get some water?'},
-      {cat:'Practical', w:'Öffnungszeiten', p:'URF-noongz-tsy-ten', en:'opening hours', de:'Wie sind die Öffnungszeiten?', enEx:'What are the opening hours?'},
-      {cat:'Practical', w:'Eintritt', p:'INE-tritt', en:'admission', de:'Wie hoch ist der Eintritt?', enEx:'How much is the admission?'},
-      {cat:'Practical', w:'Reserviert', p:'reh-zer-VEERT', en:'reserved', de:'Dieser Tisch ist reserviert.', enEx:'This table is reserved.'},
+      {cat:'Practical', w:'Toilette', p:'toy-LET-teh', en:'restroom', de:'Wo ist die Toilette?', enEx:'Where is the restroom?', r:['general']},
+      {cat:'Practical', w:'Wasser', p:'VAH-ser', en:'water', de:'Kann ich etwas Wasser bekommen?', enEx:'Can I get some water?', r:['general']},
+      {cat:'Practical', w:'Öffnungszeiten', p:'URF-noongz-tsy-ten', en:'opening hours', de:'Wie sind die Öffnungszeiten?', enEx:'What are the opening hours?', r:['general']},
+      {cat:'Practical', w:'Eintritt', p:'INE-tritt', en:'admission', de:'Wie hoch ist der Eintritt?', enEx:'How much is the admission?', r:['general']},
+      {cat:'Practical', w:'Reserviert', p:'reh-zer-VEERT', en:'reserved', de:'Dieser Tisch ist reserviert.', enEx:'This table is reserved.', r:['general']},
 
-      // Bonus regional
-      {cat:'Bavaria/Austria', w:'Servus', p:'SEHR-voos', en:'Hi/Bye (Bavaria/Austria)', de:'Servus! Wie läuft’s?', enEx:'Hey! How’s it going?'},
-      {cat:'Switzerland', w:'Grüezi', p:'GRUET-see', en:'Hello (Swiss)', de:'Grüezi! Wie gahts?', enEx:'Hello! How are you? (Swiss)'},
-      {cat:'Switzerland', w:'Merci vielmal', p:'MER-see feel-mahl', en:'Thanks a lot (Swiss)', de:'Merci vielmal für d’Hilfe!', enEx:'Thanks a lot for the help!'},
+      // Bonus regional foods/hellos
+      {cat:'Bavaria/Austria', w:'Servus', p:'SEHR-voos', en:'Hi/Bye (Bavaria/Austria)', de:'Servus! Wie läuft’s?', enEx:'Hey! How’s it going?', r:['bavaria','austria']},
+      {cat:'Food (Bavaria)', w:'Brezn', p:'BRET-zn', en:'Pretzel (Bavarian)', de:'Eine frische Brezn, bitte.', enEx:'A fresh pretzel, please.', r:['bavaria']},
+      {cat:'Food (Austria)', w:'Kaiserschmarrn', p:'KAI-zer-shmarn', en:'Shredded pancakes', de:'Kaiserschmarrn mit Apfelmus, bitte.', enEx:'Kaiserschmarrn with applesauce, please.', r:['austria']},
+      {cat:'Food (Switzerland)', w:'Rösti', p:'RER-shtee', en:'Hash browns', de:'Rösti mit Käse ist lecker.', enEx:'Rösti with cheese is tasty.', r:['swiss']},
+      {cat:'Switzerland', w:'Grüezi', p:'GRUET-see', en:'Hello (Swiss)', de:'Grüezi! Wie gahts?', enEx:'Hello! How are you? (Swiss German)', r:['swiss']},
+      {cat:'Switzerland', w:'Merci vielmal', p:'MER-see feel-mahl', en:'Thanks a lot (Swiss)', de:'Merci vielmal für d’Hilfe!', enEx:'Thanks a lot for the help!', r:['swiss']},
     ];
 
     /*************************
-     * DAILY WORD SELECTION  *
+     * SELECTION + REGIONS   *
      *************************/
-    // We pick a deterministic “random” word for the local calendar day,
-    // so it changes at midnight for your family’s location.
-    function todayKey(){
-      const now = new Date();
-      return `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
-    }
-    function hash(str){
-      // tiny FNV-1a for deterministic index
-      let h = 2166136261 >>> 0;
-      for (let i=0;i<str.length;i++){
-        h ^= str.charCodeAt(i);
-        h = Math.imul(h, 16777619);
-      }
-      return h >>> 0;
-    }
-    function pickTodayWord(){
-      const key = todayKey();
-      const idx = hash(key) % WORDS.length;
-      return {key, word: WORDS[idx]};
-    }
-
-    /**************
-     * RENDERING  *
-     **************/
     const els = {
       chip: document.getElementById('chip'),
       word: document.getElementById('word'),
@@ -272,7 +261,44 @@
       trans: document.getElementById('trans'),
       exDe: document.getElementById('ex-de'),
       exEn: document.getElementById('ex-en'),
+      prev: document.getElementById('prev'),
+      prevEmpty: document.getElementById('prev-empty'),
     };
+
+    const STORE_KEY = 'gwotd-v2';
+    function loadState(){
+      try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'{}'); }catch(e){ return {}; }
+    }
+    function saveState(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+
+    let STATE = Object.assign({city:'munich', history:[]}, loadState());
+
+    function cityToRegion(city){
+      return city==='salzburg' ? 'austria' : (city==='swiss' ? 'swiss' : 'bavaria');
+    }
+
+    function todayKey(){
+      const n = new Date();
+      // local day so family in same place sees same word
+      return `${n.getFullYear()}-${n.getMonth()+1}-${n.getDate()}`;
+    }
+
+    function hash(str){
+      let h = 2166136261>>>0;
+      for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return h>>>0;
+    }
+
+    function poolForRegion(region){
+      return WORDS.filter(w => w.r.includes('general') || w.r.includes(region));
+    }
+
+    function pickToday(region){
+      const key = todayKey() + '|' + region;
+      const pool = poolForRegion(region);
+      const idx = hash(key) % pool.length;
+      return {key, entry: pool[idx]};
+    }
 
     function render(entry){
       els.chip.textContent = `• ${entry.cat}`;
@@ -283,28 +309,63 @@
       els.exEn.textContent = entry.enEx;
     }
 
-    /****************
-     * HISTORY (opt) *
-     ****************/
-    const STORAGE_KEY = 'gwotd-history-v1';
-    function loadHistory(){
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }
-      catch(e){ return []; }
-    }
-    function saveHistory(list){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list.slice(0,60)));
+    function addToHistory(dateKey, entry){
+      // avoid duplicates
+      if(!STATE.history.find(h=>h.key===dateKey)){
+        STATE.history.unshift({key:dateKey, w:entry.w, en:entry.en});
+        STATE.history = STATE.history.slice(0,10);
+        saveState(STATE);
+      }
+      renderHistory();
     }
 
-    (function init(){
-      const {key, word} = pickTodayWord();
-      // Store (date, word) once per day
-      const hist = loadHistory();
-      if (!hist.find(h => h.date === key)){
-        hist.unshift({date:key, w:word.w});
-        saveHistory(hist);
-      }
-      render(word);
-    })();
+    function renderHistory(){
+      const list = STATE.history;
+      els.prev.innerHTML = '';
+      els.prevEmpty.style.display = list.length ? 'none' : 'flex';
+      list.forEach(row=>{
+        const d = document.createElement('div');
+        d.className = 'prev-card';
+        d.innerHTML = `<div class="prev-title">${row.w}</div><div class="small">${row.en}</div><div class="small" style="margin-top:4px">${row.key}</div>`;
+        els.prev.appendChild(d);
+      });
+    }
+
+    function setCity(city){
+      STATE.city = city; saveState(STATE);
+      document.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.city===city)));
+      showToday();
+    }
+
+    function showToday(){
+      const region = cityToRegion(STATE.city);
+      const {key, entry} = pickToday(region);
+      render(entry);
+      addToHistory(key, entry);
+    }
+
+    // text-to-speech
+    function speak(text, rate=1){
+      try{
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'de-DE';
+        u.rate = rate;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      }catch(e){ /* no-op */ }
+    }
+
+    // Wire up UI
+    document.getElementById('speak').addEventListener('click', ()=> speak(els.word.textContent, 1));
+    document.getElementById('speak-slow').addEventListener('click', ()=> speak(els.word.textContent, 0.82));
+    document.querySelectorAll('.pill').forEach(btn=>{
+      btn.addEventListener('click', ()=> setCity(btn.dataset.city));
+      if(btn.dataset.city===STATE.city) btn.setAttribute('aria-pressed','true');
+    });
+
+    // Init
+    setCity(STATE.city);
+    renderHistory();
   </script>
 </body>
 </html>
